@@ -149,6 +149,8 @@ void (async () => {
 		};
 
 		const createJsonAndDeploy = async (saveConsent: string) => {
+			saveConsent = saveConsent.toUpperCase();
+
 			const potentialPackages = generateJsonsFromFiles(descriptor.files);
 			const potentialLanguages = Array.from(
 				new Set<LanguageId>(
@@ -173,7 +175,7 @@ void (async () => {
 				);
 			}
 
-			if (saveConsent.toUpperCase() === 'Y')
+			if (saveConsent === 'Y' || saveConsent === 'YES')
 				for (const pkg of packages) {
 					await fs.writeFile(
 						join(rootPath, `metacall.json`),
@@ -181,7 +183,9 @@ void (async () => {
 					);
 				}
 
-			await deploy(saveConsent.toUpperCase() === 'Y' ? [] : packages);
+			await deploy(
+				saveConsent === 'Y' || saveConsent === 'YES' ? [] : packages
+			);
 		};
 
 		switch (descriptor.error) {
