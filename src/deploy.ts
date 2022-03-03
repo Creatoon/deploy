@@ -1,11 +1,8 @@
 import { AxiosError } from 'axios';
 import { promises as fs } from 'fs';
+import { LanguageId, MetaCallJSON } from 'metacall-protocol/deployment';
 import {
-	LanguageId,
-	LogType,
-	MetaCallJSON
-} from 'metacall-protocol/deployment';
-import {
+	findRunners,
 	generateJsonsFromFiles,
 	generatePackage,
 	PackageError
@@ -100,24 +97,12 @@ export const deployPackage = async (
 
 			try {
 				await api.deploy(name, [], plan, 'Package');
+				await logs(descriptor.runners, name);
 			} catch (err) {
 				apiError(err as AxiosError);
 			}
 
 			// TODO: Need a TUI for logs
-
-			try {
-				const container: string = await listSelection(
-					[...descriptor.runners, 'deploy'],
-					'Select a container to get logs'
-				);
-				const type =
-					container === 'deploy' ? LogType.Deploy : LogType.Job;
-
-				await logs(container, name, type);
-			} catch (err) {
-				apiError(err as AxiosError);
-			}
 		};
 
 		const createJsonAndDeploy = async (saveConsent: string) => {
@@ -212,15 +197,19 @@ export const deployFromRepository = async (
 		if (!branches.length) return error('Invalid Repository URL');
 
 		//todo api response type should be created in protocol , it is string as of now
-		const name = (
-			await api.add(
-				url,
-				await listSelection(branches, 'Select branch :'),
-				[]
-			)
-		).id;
+
+		const selectedBranch = await listSelection(branches, 'Select branch :');
+
+		const name = (await api.add(url, selectedBranch, [])).id;
+
+		const runners = Array.from(
+			findRunners(await api.fileList(url, selectedBranch))
+		);
 
 		await api.deploy(name, [], plan, 'Repository');
+
+		await logs(runners, name.split('/').join('-'));
+
 		info('Repository deployed');
 	} catch (e) {
 		error(String(e));
