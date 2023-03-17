@@ -153,8 +153,13 @@ describe('Integration CLI', function () {
 
 	// --token
 	it('Should be able to login using --token flag', async function () {
+		console.log(configFilePath());
 		const file = await loadFile(configFilePath());
+		console.log(file);
+		console.log('File conetent must be above');
 		const token = file.split('=')[1];
+		console.log(token);
+		console.log('Token must be above');
 
 		await clearCache();
 
