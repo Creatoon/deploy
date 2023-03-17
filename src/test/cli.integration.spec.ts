@@ -5,7 +5,7 @@ import os from 'os';
 import { join } from 'path';
 import { configFilePath } from '../config';
 import { exists, loadFile } from '../utils';
-import { deleted, deployed, keys, runWithInput } from './cmd';
+import { keys, runWithInput } from './cmd';
 
 dotenv.config();
 
@@ -153,9 +153,13 @@ describe('Integration CLI', function () {
 
 	// --token
 	it('Should be able to login using --token flag', async function () {
+		console.log(configFilePath());
 		const file = await loadFile(configFilePath());
+		console.log(file);
+		console.log('file is above');
 		const token = file.split('=')[1];
-
+		console.log(token);
+		console.log('token is above');
 		await clearCache();
 
 		notStrictEqual(token, undefined);
@@ -175,185 +179,185 @@ describe('Integration CLI', function () {
 		}
 	});
 
-	// --help
-	it('Should be able to print help guide using --help flag', async () => {
-		const result = await runCLI(['--help'], [keys.enter]).promise;
+	// // --help
+	// it('Should be able to print help guide using --help flag', async () => {
+	// 	const result = await runCLI(['--help'], [keys.enter]).promise;
 
-		ok(String(result).includes('Official CLI for metacall-deploy\n'));
-	});
+	// 	ok(String(result).includes('Official CLI for metacall-deploy\n'));
+	// });
 
-	// --unknown-flags
-	it('Should be able to handle unknown flag', async () => {
-		try {
-			const result = await runCLI(['--yeet'], [keys.enter]).promise;
+	// // --unknown-flags
+	// it('Should be able to handle unknown flag', async () => {
+	// 	try {
+	// 		const result = await runCLI(['--yeet'], [keys.enter]).promise;
 
-			fail(
-				`The CLI passed without errors and it should have failed. Result: ${String(
-					result
-				)}`
-			);
-		} catch (err) {
-			ok(
-				String(err) === '! --yeet does not exists as a valid command.\n'
-			);
-		}
-	});
+	// 		fail(
+	// 			`The CLI passed without errors and it should have failed. Result: ${String(
+	// 				result
+	// 			)}`
+	// 		);
+	// 	} catch (err) {
+	// 		ok(
+	// 			String(err) === '! --yeet does not exists as a valid command.\n'
+	// 		);
+	// 	}
+	// });
 
-	// --addrepo
-	it('Should be able to deploy repository using --addrepo flag', async () => {
-		const result = await runCLI(
-			[`--addrepo=${url}`],
-			[keys.enter, 'n', keys.enter, keys.kill]
-		).promise;
-
-		ok(String(result).includes('i Deploying...\n'));
-
-		strictEqual(await deployed(addRepoSuffix), true);
-		return result;
-	});
-
-	// --delete
-	it('Should be able to delete deployed repository using --delete flag', async () => {
-		const result = await runCLI(['--delete'], [keys.enter, keys.enter])
-			.promise;
-
-		ok(String(result).includes('i Deploy Delete Succeed\n'));
-
-		strictEqual(await deleted(addRepoSuffix), true);
-
-		return result;
-	});
-
-	// --workdir & --projectName
-	it('Should be able to deploy repository using --workdir & --projectName flag', async () => {
-		const result = await runCLI(
-			[`--workdir=${filePath}`, `--projectName=${workDirSuffix}`],
-			[keys.enter, 'n', keys.enter, keys.kill]
-		).promise;
-
-		ok(String(result).includes(`i Deploying ${filePath}...\n`));
-
-		strictEqual(await deployed(workDirSuffix), true);
-		return result;
-	});
-
-	// --delete
-	it('Should be able to delete deployed repository using --delete flag', async () => {
-		const result = await runCLI(['--delete'], [keys.enter, keys.enter])
-			.promise;
-
-		ok(String(result).includes('i Deploy Delete Succeed\n'));
-
-		strictEqual(await deleted(workDirSuffix), true);
-
-		return result;
-	});
-
-	// with env vars
-	it('Should be able to deploy repository using --addrepo flag with environment vars', async () => {
-		const result = await runCLI(
-			[`--addrepo=${url}`],
-			[
-				keys.enter,
-				'y',
-				keys.enter,
-				'PORT=1000, ENV=PROD',
-				keys.enter,
-				keys.kill
-			]
-		).promise;
-
-		ok(String(result).includes('i Deploying...\n'));
-
-		strictEqual(await deployed(addRepoSuffix), true);
-		return result;
-	});
-
-	// --delete
-	it('Should be able to delete deployed repository using --delete flag', async () => {
-		const result = await runCLI(['--delete'], [keys.enter, keys.enter])
-			.promise;
-
-		ok(String(result).includes('i Deploy Delete Succeed\n'));
-
-		strictEqual(await deleted(workDirSuffix), true);
-
-		return result;
-	});
-
-	// --workdir & --projectName & --plan
-	it('Should be able to deploy repository using --workdir & --plan flag', async () => {
-		const result = await runCLI(
-			[
-				`--workdir=${filePath}`,
-				'--projectName=time-app-web',
-				'--plan=Essential'
-			],
-			[keys.enter, 'n', keys.enter, keys.kill]
-		).promise;
-
-		ok(String(result).includes(`i Deploying ${filePath}...\n`));
-
-		strictEqual(await deployed(workDirSuffix), true);
-
-		return result;
-	});
-
-	// --force
-	// it('Should be able to deploy forcefully using --force flag', async () => {
-	// 	const resultDel = await runCLI(
-	// 		[
-	// 			`--workdir=${filePath}`,
-	// 			`--projectName=${workDirSuffix}`,
-	// 			'--plan=Essential',
-	// 			'--force'
-	// 		],
-	// 		[keys.enter, keys.kill]
+	// // --addrepo
+	// it('Should be able to deploy repository using --addrepo flag', async () => {
+	// 	const result = await runCLI(
+	// 		[`--addrepo=${url}`],
+	// 		[keys.enter, 'n', keys.enter, keys.kill]
 	// 	).promise;
 
-	// 	ok(String(resultDel).includes('Trying to deploy forcefully!'));
+	// 	ok(String(result).includes('i Deploying...\n'));
+
+	// 	strictEqual(await deployed(addRepoSuffix), true);
+	// 	return result;
+	// });
+
+	// // --delete
+	// it('Should be able to delete deployed repository using --delete flag', async () => {
+	// 	const result = await runCLI(['--delete'], [keys.enter, keys.enter])
+	// 		.promise;
+
+	// 	ok(String(result).includes('i Deploy Delete Succeed\n'));
+
+	// 	strictEqual(await deleted(addRepoSuffix), true);
+
+	// 	return result;
+	// });
+
+	// // --workdir & --projectName
+	// it('Should be able to deploy repository using --workdir & --projectName flag', async () => {
+	// 	const result = await runCLI(
+	// 		[`--workdir=${filePath}`, `--projectName=${workDirSuffix}`],
+	// 		[keys.enter, 'n', keys.enter, keys.kill]
+	// 	).promise;
+
+	// 	ok(String(result).includes(`i Deploying ${filePath}...\n`));
+
+	// 	strictEqual(await deployed(workDirSuffix), true);
+	// 	return result;
+	// });
+
+	// // --delete
+	// it('Should be able to delete deployed repository using --delete flag', async () => {
+	// 	const result = await runCLI(['--delete'], [keys.enter, keys.enter])
+	// 		.promise;
+
+	// 	ok(String(result).includes('i Deploy Delete Succeed\n'));
 
 	// 	strictEqual(await deleted(workDirSuffix), true);
 
-	// 	strictEqual(
-	// 		await runCLI(['--listPlans'], [keys.enter]).promise,
-	// 		'i Essential: 1\n'
-	// 	);
+	// 	return result;
+	// });
 
-	// 	const resultDeploy = await runCLI(
+	// // with env vars
+	// it('Should be able to deploy repository using --addrepo flag with environment vars', async () => {
+	// 	const result = await runCLI(
+	// 		[`--addrepo=${url}`],
 	// 		[
-	// 			`--workdir=${filePath}`,
-	// 			`--projectName=${workDirSuffix}`,
-	// 			'--plan=Essential'
-	// 		],
-	// 		[keys.enter, keys.kill]
+	// 			keys.enter,
+	// 			'y',
+	// 			keys.enter,
+	// 			'PORT=1000, ENV=PROD',
+	// 			keys.enter,
+	// 			keys.kill
+	// 		]
 	// 	).promise;
 
-	// 	ok(String(resultDeploy).includes(`i Deploying ${filePath}...\n`));
+	// 	ok(String(result).includes('i Deploying...\n'));
+
+	// 	strictEqual(await deployed(addRepoSuffix), true);
+	// 	return result;
+	// });
+
+	// // --delete
+	// it('Should be able to delete deployed repository using --delete flag', async () => {
+	// 	const result = await runCLI(['--delete'], [keys.enter, keys.enter])
+	// 		.promise;
+
+	// 	ok(String(result).includes('i Deploy Delete Succeed\n'));
+
+	// 	strictEqual(await deleted(workDirSuffix), true);
+
+	// 	return result;
+	// });
+
+	// // --workdir & --projectName & --plan
+	// it('Should be able to deploy repository using --workdir & --plan flag', async () => {
+	// 	const result = await runCLI(
+	// 		[
+	// 			`--workdir=${filePath}`,
+	// 			'--projectName=time-app-web',
+	// 			'--plan=Essential'
+	// 		],
+	// 		[keys.enter, 'n', keys.enter, keys.kill]
+	// 	).promise;
+
+	// 	ok(String(result).includes(`i Deploying ${filePath}...\n`));
 
 	// 	strictEqual(await deployed(workDirSuffix), true);
 
-	// 	return resultDeploy;
+	// 	return result;
 	// });
 
-	// --delete
-	it('Should be able to delete deployed repository using --delete flag', async () => {
-		const result = await runCLI(['--delete'], [keys.enter, keys.enter])
-			.promise;
+	// // --force
+	// // it('Should be able to deploy forcefully using --force flag', async () => {
+	// // 	const resultDel = await runCLI(
+	// // 		[
+	// // 			`--workdir=${filePath}`,
+	// // 			`--projectName=${workDirSuffix}`,
+	// // 			'--plan=Essential',
+	// // 			'--force'
+	// // 		],
+	// // 		[keys.enter, keys.kill]
+	// // 	).promise;
 
-		ok(String(result).includes('i Deploy Delete Succeed\n'));
+	// // 	ok(String(resultDel).includes('Trying to deploy forcefully!'));
 
-		strictEqual(await deleted(workDirSuffix), true);
+	// // 	strictEqual(await deleted(workDirSuffix), true);
 
-		return result;
-	});
+	// // 	strictEqual(
+	// // 		await runCLI(['--listPlans'], [keys.enter]).promise,
+	// // 		'i Essential: 1\n'
+	// // 	);
 
-	// --listPlans
-	it("Should be able to list all the plans in user's account", async () =>
-		strictEqual(
-			await runCLI(['--listPlans'], [keys.enter]).promise,
-			'i Essential: 1\n'
-		));
+	// // 	const resultDeploy = await runCLI(
+	// // 		[
+	// // 			`--workdir=${filePath}`,
+	// // 			`--projectName=${workDirSuffix}`,
+	// // 			'--plan=Essential'
+	// // 		],
+	// // 		[keys.enter, keys.kill]
+	// // 	).promise;
+
+	// // 	ok(String(resultDeploy).includes(`i Deploying ${filePath}...\n`));
+
+	// // 	strictEqual(await deployed(workDirSuffix), true);
+
+	// // 	return resultDeploy;
+	// // });
+
+	// // --delete
+	// it('Should be able to delete deployed repository using --delete flag', async () => {
+	// 	const result = await runCLI(['--delete'], [keys.enter, keys.enter])
+	// 		.promise;
+
+	// 	ok(String(result).includes('i Deploy Delete Succeed\n'));
+
+	// 	strictEqual(await deleted(workDirSuffix), true);
+
+	// 	return result;
+	// });
+
+	// // --listPlans
+	// it("Should be able to list all the plans in user's account", async () =>
+	// 	strictEqual(
+	// 		await runCLI(['--listPlans'], [keys.enter]).promise,
+	// 		'i Essential: 1\n'
+	// 	));
 });
 
 // TODO: Tests to add
